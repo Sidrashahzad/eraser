@@ -1,52 +1,50 @@
-int x = 20, y = 40, w = 70, h = 50;
+PGraphics canvas;
 
 void setup() {
-  size(600, 600);
-  background(255);
-
-  stroke(240);
-  for (int linex = 0; linex < width; linex = linex+40) {
-    for (int liney = 0; liney < height; liney = liney + 40) {
-      line(0, liney, width, liney);
-    }
-    line(linex, 0, linex, height);
-  }
-
-  fill(255, 0, 0);
-  rect(x, height - 250, w, h);
-
-  fill(0, 255, 0);
-  rect(x, height - 190, w, h);
-
-  fill(0, 0, 255);
-  rect(x, height - 130, w, h);
-
-  fill(0);
-  rect(x, y, w, h);
-  textSize(17);
-  text("Erase everything", 10, 30);
+  size(500,500);
+  smooth();
+  canvas = createGraphics(width,height,JAVA2D);
+  canvas.beginDraw();
+  canvas.smooth();
+  canvas.endDraw();
 }
 
 void draw() {
-  if ((keyPressed && key == 'r') || (mousePressed && mouseX > x && mouseX < x + w && mouseY > (height - 250) && mouseY < (height - 250) + h)) {
-    fill(255, 0, 0);
+  background(255);
+  noStroke();
+  for (int i=0; i<10; i++) {
+    fill(i*25);
+    rect(i*width/10,0,width/10,height);
   }
-  if (keyPressed && key == 'g'|| (mousePressed && mouseX > x && mouseX < x + w && mouseY > (height - 190) && mouseY < (height - 190) + h)) {
-    fill(0, 255, 0);
-  }
-  if (keyPressed && key == 'b' || (mousePressed && mouseX > x && mouseX < x + w && mouseY > (height - 130) && mouseY < (height - 130) + h))  {
-    fill(0, 0, 255);
-  }
-  if (keyPressed && key == 'n'){
-    fill(0);
-  }
+  image(canvas,0,0);
+}
 
-  if (mousePressed) {
-    noStroke();
-    ellipse(mouseX, mouseY, 20, 20);
-  }
+void mouseDragged() {
+  if (mouseButton == LEFT) { drawFunction(); }
+  else { noFill(); stroke(0,255,0); ellipse(mouseX,mouseY,50,50); eraseFunction(); }
+}
 
-  if (mouseX > x && mouseX < x + w && mouseY > y && mouseY < y+h && mousePressed) {
-    setup();
+void drawFunction() {
+  canvas.beginDraw();
+  canvas.noStroke();
+  canvas.fill(255,0,0);
+  canvas.ellipse(mouseX,mouseY,50,50);
+  canvas.endDraw();
+}
+
+void eraseFunction() {
+  color c = color(0,0);
+  canvas.beginDraw();
+  canvas.loadPixels();
+  for (int x=0; x<canvas.width; x++) {
+    for (int y=0; y<canvas.height; y++ ) {
+      float distance = dist(x,y,mouseX,mouseY);
+      if (distance <= 25) {
+        int loc = x + y*canvas.width;
+        canvas.pixels[loc] = c;
+      }
+    }
   }
+  canvas.updatePixels();
+  canvas.endDraw();
 }
